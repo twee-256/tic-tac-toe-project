@@ -1,6 +1,6 @@
 
 // for the board
-const GameBoard = function () {
+function GameBoard() {
     const board = [];
     let num = 1;
     for (let i = 0; i < 3; i++) {
@@ -12,18 +12,18 @@ const GameBoard = function () {
     }
     const getBoard = () => board;
 
-    return { board, getBoard };
+    return { getBoard };
 };
 
-const gb = GameBoard();
+// const gb = GameBoard();
 
 // for the players
 const CreatePlayer = (name, marker) => ({ name, marker });
 
 //for the game
-const GameController = (function () {
-    const playBoard = GameBoard();
-    const board = playBoard.getBoard();
+function GameController() {
+
+    const board = GameBoard().getBoard();
     console.log(board);
 
     let players = [];
@@ -75,7 +75,7 @@ const GameController = (function () {
         placeMark(pos.row, pos.col);
     }
 
-    window.addEventListener('keydown', gameEvent);
+    // window.addEventListener('keydown', gameEvent);
 
     // check win
     function checkWin() {
@@ -83,10 +83,11 @@ const GameController = (function () {
         const rows = board.length;
         const cols = board[0].length;
         const isMarker = v => v === "X" || v === "O";
+
         // horizontals
         for (let r = 0; r < rows; r++) {
             const a = board[r][0];
-            if (isMarker(a) && a == board[r][1] && a == board[r][2]) {
+            if (isMarker(a) && a === board[r][1] && a === board[r][2]) {
                 console.log("Win!");
                 // return true;
             }
@@ -96,7 +97,7 @@ const GameController = (function () {
         // verticals
         for (let c = 0; c < cols - 1; c++) {
             const a = board[0][c];
-            if (isMarker(a) && a == board[1][c] && a == board[2][c]) {
+            if (isMarker(a) && a === board[1][c] && a === board[2][c]) {
                 console.log("Win!");
                 // return true;
             }
@@ -138,7 +139,44 @@ const GameController = (function () {
         }
     }
 
-    return { setPlayers, board };
-}());
+    return { setPlayers, gameEvent, board, checkWin };
+};
 
-GameController.setPlayers("jeff", "mary");
+function ScreenDisplay() {
+    const game = GameController();
+    game.setPlayers("Player 1", "Player 2");
+    const boardDisplay = document.querySelector(".flex-container");
+    // boardDisplay.textContent = "";
+
+    const UpdateScreen = () => {
+        boardDisplay.textContent = "";
+        const board = game.board;
+        console.log(board);
+        board.forEach(row => {
+            console.log(row);
+            row.forEach(cell => {
+                console.log(cell);
+                const boxButton = document.createElement("button");
+                boxButton.classList.add("flex-item");
+                boxButton.textContent = cell;
+                if (cell === "X") {
+                    boxButton.classList.add("flex-x");
+                }
+                if (cell === "O") {
+                    boxButton.classList.add("flex-o");
+                }
+                boardDisplay.appendChild(boxButton);
+            });
+        });
+    }
+
+    UpdateScreen();
+
+    window.addEventListener('keydown', event => {
+        game.gameEvent(event);
+        UpdateScreen();
+    });
+};
+
+ScreenDisplay();
+// GameController.setPlayers("jeff", "mary");
